@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GLOBAL SERVER CONTROL</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#07121b;color:#b9dce8;font-family:Consolas,monospace}
+header{padding:14px;background:#0b1c29;border-bottom:1px solid #24516a;display:flex;justify-content:space-between;font-size:11px}
+.brand{color:#70d9f3;font-weight:bold;letter-spacing:2px}
+#status{color:#57e6a0}
+main{display:grid;grid-template-columns:190px minmax(0,1fr) 210px;gap:9px;padding:9px}
+.panel{background:#0b1d2a;border:1px solid #1c4860;min-width:0;overflow:hidden}
+.heading{padding:10px;background:#102b3b;color:#70cce5;font-size:10px;border-bottom:1px solid #23516a}
+.content{padding:12px}
+.metric{margin-bottom:20px}
+.metric small{color:#789ba9;font-size:10px}
+.metric strong{display:block;font-size:25px;color:#8ee7f6;margin-top:5px}
+.graph{height:45px;display:flex;align-items:end;gap:3px}
+.graph i{flex:1;background:#208da5}
+.green{color:#5ee5a1}
+.yellow{color:#e6c56b}
+.center{grid-column:2}
+.terminal{height:330px;overflow:auto;background:#041019;border:1px solid #1c4659;padding:10px;font-size:11px;color:#68d8aa;line-height:1.65;overflow-wrap:anywhere}
+.log-user{color:#7dd8ff}
+.log-error{color:#ff6878}
+.log-info{color:#c2dce5}
+.input-row{display:flex;margin-top:10px;background:#06131b;border:1px solid #28536a}
+.input-row span{padding:12px;color:#62e3a0}
+#command{flex:1;min-width:0;background:transparent;border:0;color:#a2f5c2;outline:none;padding:12px 3px;font-family:inherit}
+#command:disabled{opacity:.3}
+.progress-bg{height:9px;background:#142d3a;margin:10px 0}
+.progress{height:100%;width:0%;background:#55d6ba;transition:width .1s}
+#percent{font-size:23px;color:#72e3ce}
+#missionInfo,#message{font-size:10px;color:#8aaebb;margin-top:6px;min-height:16px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+button{background:#123b50;color:#8de9f5;border:1px solid #3996ae;padding:12px 8px;font-family:inherit;font-size:10px;cursor:pointer;width:100%;overflow-wrap:anywhere}
+button:hover:not(:disabled){background:#1a6174}
+button:disabled{opacity:.35;cursor:not-allowed}
+#noPush{background:#30151d;border-color:#a84b5b;color:#ff8b99}
+#speed{display:flex;gap:5px;margin-top:10px}
+#speed button{padding:8px}
+.selected{background:#17634a!important;border-color:#56e5a5!important}
+.right{grid-column:3}
+table{width:100%;font-size:10px;border-collapse:collapse}
+td,th{padding:8px 3px;text-align:left;border-bottom:1px solid #193b4d}
+th{color:#6eb6ca}
+.circles{display:flex;justify-content:space-around;margin:20px 0}
+.circle{border:2px solid #3295a9;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#74e6e5;font-size:10px}
+.bottom{grid-column:1/4}
+#events{font-size:10px;line-height:2;color:#76b5c8}
+#shutdown,#reveal{display:none;position:fixed;inset:0;z-index:20;background:#000;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:25px}
+#shutdown{color:#87949b}
+#shutdown h2{letter-spacing:4px}
+#reveal{z-index:30;background:#05090c}
+#reveal h1{color:#ff5968;font-size:clamp(25px,5vw,43px)}
+#reveal p{color:#d8eaf0;font-size:18px;line-height:2}
+#reveal small{color:#68818c}
+#reveal button{max-width:220px;margin-top:25px}
+@media(max-width:750px){
+ main{grid-template-columns:1fr 1fr}
+ .left{grid-column:1}
+ .right{grid-column:2}
+ .center{grid-column:1/3}
+ .bottom{grid-column:1/3}
+ .terminal{height:260px}
+}
+@media(max-width:450px){
+ main{grid-template-columns:1fr}
+ .left,.right,.center,.bottom{grid-column:1}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <span class="brand">GLOBAL SERVER CONTROL</span>
+ <span>SIMULATION SYSTEM</span>
+ <span id="status">● ONLINE</span>
+</header>
+
+<main>
+<section class="panel left">
+ <div class="heading">SERVER INFRASTRUCTURE</div>
+ <div class="content">
+  <div class="metric"><small>ACTIVE NODES</small><strong id="nodes">864</strong></div>
+  <div class="metric"><small>NETWORK LOAD</small><strong id="load">42.08%</strong></div>
+  <div class="metric"><small>DATA FLOW</small><div class="graph" id="graph"></div></div>
+  <div class="metric">
+   <small>CONNECTION</small>
+   <p class="green">● CONNECTED</p>
+   <p class="green">● MONITORING</p>
+   <p class="yellow">● SIMULATION ACTIVE</p>
+  </div>
+ </div>
+</section>
+
+<section class="panel center">
+ <div class="heading">CENTRAL TERMINAL / COMMAND INTERFACE</div>
+ <div class="content">
+  <div class="terminal" id="terminal">
+   <div class="log-info">GLOBAL TERMINAL SYSTEM v9.5</div>
+   <div class="log-info">Initializing virtual environment...</div>
+   <div class="log-info">Waiting for user input...</div>
+  </div>
+  <div class="input-row">
+   <span>&gt;</span>
+   <input id="command" placeholder="Enter command..." autocomplete="off" spellcheck="false">
+  </div>
+  <small>ENTER TO EXECUTE / SIMULATED TERMINAL</small>
+ </div>
+</section>
+
+<section class="panel right">
+ <div class="heading">SERVER ACTIVITY</div>
+ <div class="content">
+  <table>
+   <tr><th>LOCATION</th><th>STATUS</th></tr>
+   <tr><td>NEW YORK</td><td class="green">ACTIVE</td></tr>
+   <tr><td>LONDON</td><td class="green">ACTIVE</td></tr>
+   <tr><td>TOKYO</td><td class="green">ACTIVE</td></tr>
+   <tr><td>SINGAPORE</td><td class="green">ACTIVE</td></tr>
+   <tr><td>FRANKFURT</td><td class="yellow">BUSY</td></tr>
+   <tr><td>SYDNEY</td><td class="green">ACTIVE</td></tr>
+  </table>
+  <div class="circles">
+   <div class="circle" id="cpu">98%</div>
+   <div class="circle" id="memory">76%</div>
+   <div class="circle" id="network">91%</div>
+  </div>
+  <small>CPU / MEMORY / NETWORK</small>
+ </div>
+</section>
+
+<section class="panel bottom">
+ <div class="heading">MISSION CONTROL</div>
+ <div class="content">
+  <div>Until the mission is complete</div>
+  <div class="progress-bg"><div class="progress" id="bar"></div></div>
+  <div id="percent">0%</div>
+  <div id="missionInfo">INITIALIZING...</div>
+
+  <!-- ボタンは最初からDOMに存在させる -->
+  <div class="buttons">
+   <button id="testButton" disabled>PUSH TO TEST</button>
+   <button id="noPush" style="display:none">NO PUSH</button>
+  </div>
+
+  <div id="speed">
+   <button id="speed1" class="selected">×1 SPEED</button>
+   <button id="speed4">×4 SPEED</button>
+  </div>
+  <div id="message">SYSTEM INITIALIZATION</div>
+ </div>
+</section>
+
+<section class="panel bottom">
+ <div class="heading">SYSTEM EVENT LOG</div>
+ <div class="content" id="events">
+  [SYSTEM] Initialization<br>
+  [SYSTEM] Virtual environment ready<br>
+  [SYSTEM] Monitoring started
+ </div>
+</section>
+</main>
+
+<div id="shutdown">
+ <h2 id="shutdownText">SYSTEM SHUTDOWN</h2>
+ <small>TERMINATING SIMULATION...</small>
+</div>
+
+<div id="reveal">
+ <h1>これに騙されたあなたへ。</h1>
+ <p>
+  こういうのを信じるから<br>
+  詐欺に騙されるんですよ。<br>
+  安心を。<br>
+  これはドッキリ専用サイトですｗ
+ </p>
+ <small>NO REAL SERVER ACCESS / NO FILE DOWNLOAD</small>
+ <button onclick="location.reload()">REPLAY SIMULATION</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const terminal=$("terminal");
+const command=$("command");
+
+let speed=1;
+let mission=0;
+let testCount=0;
+let locked=false;
+let mode="mission";
+let remaining=60;
+let lastTime=Date.now();
+let missionTimer=null;
+let logTimer=null;
+let operationTimer=null;
+
+const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-=+{}[]";
+
+function randomString(n=50){
+ let s="";
+ for(let i=0;i<n;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+ return s;
+}
+
+function addLog(text,type="system"){
+ const d=document.createElement("div");
+ d.className="log-"+type;
+ d.textContent=text;
+ terminal.appendChild(d);
+ while(terminal.children.length>100)terminal.removeChild(terminal.firstChild);
+ terminal.scrollTop=terminal.scrollHeight;
+}
+
+function event(text){
+ const d=document.createElement("div");
+ d.textContent="[EVENT] "+text;
+ $("events").prepend(d);
+ while($("events").children.length>15)$("events").lastChild.remove();
+}
+
+function startLogs(){
+ stopLogs();
+ if(locked)return;
+ logTimer=setInterval(()=>{if(!locked)addLog("[SYS] "+randomString());},110/speed);
+}
+function stopLogs(){clearInterval(logTimer)}
+
+function lockInput(){
+ locked=true;
+ command.disabled=true;
+ stopLogs();
+}
+function unlockInput(){
+ locked=false;
+ command.disabled=false;
+ startLogs();
+}
+
+command.addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!locked){
+  const v=command.value.trim();
+  if(!v)return;
+  addLog("> "+v,"user");
+  command.value="";
+ }
+});
+
+function randomGraph(){
+ $("graph").innerHTML="";
+ for(let i=0;i<24;i++){
+  const b=document.createElement("i");
+  b.style.height=(10+Math.random()*35)+"px";
+  $("graph").appendChild(b);
+ }
+}
+randomGraph();
+
+setInterval(()=>{
+ if(locked)return;
+ randomGraph();
+ $("load").textContent=(35+Math.random()*55).toFixed(2)+"%";
+ $("nodes").textContent=Math.floor(800+Math.random()*150);
+ $("cpu").textContent=Math.floor(60+Math.random()*39)+"%";
+ $("memory").textContent=Math.floor(50+Math.random()*40)+"%";
+ $("network").textContent=Math.floor(70+Math.random()*29)+"%";
+},1800);
+
+function setSpeed(v){
+ speed=v;
+ $("speed1").classList.toggle("selected",v===1);
+ $("speed4").classList.toggle("selected",v===4);
+ if(!locked)startLogs();
+}
+
+$("speed1").onclick=()=>setSpeed(1);
+$("speed4").onclick=()=>setSpeed(4);
+
+function startMission(){
+ remaining=60;
+ lastTime=Date.now();
+ startLogs();
+
+ missionTimer=setInterval(()=>{
+  const now=Date.now();
+  remaining-=(now-lastTime)/1000*speed;
+  lastTime=now;
+  mission=Math.min(100,(60-remaining)/60*100);
+  $("bar").style.width=mission+"%";
+  $("percent").textContent=Math.floor(mission)+"%";
+
+  if(remaining<=0){
+   clearInterval(missionTimer);
+   mission=100;
+   $("bar").style.width="100%";
+   $("percent").textContent="100%";
+   $("missionInfo").textContent="MISSION READY";
+   $("message").textContent="Ready for testing.";
+   $("testButton").disabled=false;
+  }
+ },50);
+}
+
+function testMission(){
+ if(locked||mission<100||mode!=="mission"&&mode!=="failed")return;
+
+ lockInput();
+ $("testButton").disabled=true;
+ $("noPush").style.display="none";
+ $("missionInfo").textContent="TESTING...";
+ $("status").textContent="● PROCESSING";
+ addLog("> STARTING VERIFICATION...","info");
+ event("Verification started");
+
+ clearTimeout(operationTimer);
+ operationTimer=setTimeout(()=>{
+  testCount++;
+  if(testCount<=2)failed();
+  else success();
+ },3000/speed);
+}
+
+function failed(){
+ mode="failed";
+ addLog("!!! VERIFICATION FAILED !!!","error");
+ $("status").textContent="● RETRY REQUIRED";
+ $("status").style.color="#e6c56b";
+ $("missionInfo").textContent="VERIFICATION FAILED";
+ $("percent").textContent="FAILED";
+ $("message").textContent="Test failed. Terminal unlocked.";
+ $("bar").style.background="#e35b70";
+ $("noPush").style.display="block";
+ $("testButton").textContent="PUSH TO TEST";
+ $("testButton").onclick=testMission;
+ event("Verification failed");
+
+ setTimeout(()=>{
+  if(mode!=="failed")return;
+  mission=100;
+  $("bar").style.width="100%";
+  $("bar").style.background="#55d6ba";
+  $("percent").textContent="100%";
+  $("missionInfo").textContent="RETRY AVAILABLE";
+  $("status").textContent="● ONLINE";
+  $("status").style.color="#57e6a0";
+  $("testButton").disabled=false;
+  unlockInput();
+ },1800/speed);
+}
+
+function success(){
+ mode="verified";
+ addLog("> VERIFICATION SUCCESSFUL","info");
+ $("status").textContent="● VERIFIED";
+ $("missionInfo").textContent="VERIFICATION COMPLETE";
+ $("percent").textContent="100%";
+ $("message").textContent="Verification successful.";
+ $("noPush").style.display="block";
+ $("testButton").disabled=false;
+ $("testButton").textContent="PUSH TO SECRET DOCUMENT FILE DOWNLOAD";
+ $("testButton").onclick=startDownload;
+ event("Verification completed");
+}
+
+function startDownload(){
+ if(locked||mode!=="verified")return;
+ mode="download";
+ lockInput();
+ $("testButton").disabled=true;
+ $("missionInfo").textContent="DOWNLOADING DOCUMENT...";
+ $("message").textContent="Simulated download in progress.";
+ $("bar").style.width="0%";
+ $("percent").textContent="0%";
+ addLog("> INITIALIZING DOCUMENT DOWNLOAD...","info");
+ event("Simulated download started");
+
+ let elapsed=0;
+ let last=Date.now();
+
+ operationTimer=setInterval(()=>{
+  const now=Date.now();
+  elapsed+=(now-last)*speed;
+  last=now;
+  const p=Math.min(100,elapsed/30000*100);
+  $("bar").style.width=p+"%";
+  $("percent").textContent=Math.floor(p)+"%";
+  if(Math.random()<0.4)addLog("[DOWNLOAD] "+randomString(35));
+  if(p>=100){
+   clearInterval(operationTimer);
+   downloadComplete();
+  }
+ },50);
+}
+
+function downloadComplete(){
+ mode="complete";
+ lockInput();
+ $("status").textContent="● COMPLETE";
+ $("missionInfo").textContent="MISSION COMPLETE";
+ $("message").textContent="Simulated download completed.";
+ $("percent").textContent="100%";
+ addLog("> DOWNLOAD COMPLETE","info");
+ addLog("> MISSION COMPLETE","info");
+ $("testButton").disabled=false;
+ $("testButton").textContent="MISSION COMPLETE. NEXT PHASE";
+ $("testButton").onclick=nextPhase;
+ $("noPush").style.display="block";
+ event("Mission completed");
+}
+
+function shutdown(){
+ if(mode==="shutdown")return;
+ mode="shutdown";
+ lockInput();
+ clearInterval(missionTimer);
+ clearInterval(operationTimer);
+ clearTimeout(operationTimer);
+ $("testButton").disabled=true;
+ $("noPush").disabled=true;
+ $("status").textContent="● SHUTTING DOWN";
+ $("shutdown").style.display="flex";
+
+ const messages=[
+  "TERMINATING SIMULATION...",
+  "CLOSING VIRTUAL TERMINAL...",
+  "STOPPING SERVICES...",
+  "SYSTEM SHUTDOWN",
+  " "
+ ];
+ let i=0;
+ const t=setInterval(()=>{
+  $("shutdownText").textContent=messages[i]||" ";
+  i++;
+  if(i>=messages.length){
+   clearInterval(t);
+   $("shutdown").innerHTML="";
+  }
+ },650);
+}
+
+function nextPhase(){
+ if(mode!=="complete")return;
+ mode="reveal";
+ $("reveal").style.display="flex";
+}
+
+$("testButton").onclick=testMission;
+$("noPush").onclick=shutdown;
+
+window.addEventListener("load",()=>{
+ addLog("> VIRTUAL SERVER INITIALIZED","info");
+ addLog("> TERMINAL READY","info");
+ addLog("> SIMULATION STARTED","info");
+ event("System initialized");
+ startMission();
+});
+</script>
+</body>
+</html>
