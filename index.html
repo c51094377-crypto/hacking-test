@@ -45,7 +45,7 @@ h1{font-size:20px;letter-spacing:3px;color:#70d9e8;margin:0}
 .terminal{
   height:260px;overflow-y:auto;background:#050b10;
   border:1px solid #203943;padding:12px;font-size:12px;
-  line-height:1.7;white-space:pre-wrap;
+  line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;
 }
 .log{color:#7db5bd}
 .userlog{color:#e8d58a}
@@ -88,8 +88,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
 #prank{
   display:none;position:fixed;inset:0;background:#05090d;
   z-index:25;align-items:center;justify-content:center;
-  text-align:center;padding:25px;color:#d8e9e9;
-  line-height:2;
+  text-align:center;padding:25px;color:#d8e9e9;line-height:2;
 }
 @media(max-width:850px){
   .dashboard{grid-template-columns:1fr}
@@ -113,67 +112,74 @@ button:disabled{opacity:.35;cursor:not-allowed}
 </header>
 
 <div class="dashboard">
-  <section class="panel">
-    <h2>SERVER STATUS</h2>
-    <div class="stat"><span>ACTIVE NODES</span><span class="value" id="nodes">---</span></div>
-    <div class="stat"><span>CPU USAGE</span><span class="value" id="cpu">---</span></div>
-    <div class="bar"><div class="fill" id="cpuBar"></div></div>
-    <div class="stat"><span>MEMORY</span><span class="value" id="memory">---</span></div>
-    <div class="bar"><div class="fill" id="memoryBar"></div></div>
-    <div class="stat"><span>NETWORK LOAD</span><span class="value" id="network">---</span></div>
-    <div class="bar"><div class="fill" id="networkBar"></div></div>
-  </section>
 
-  <section class="panel center">
-    <div class="mission">
-      <div class="mission-title">MISSION PROGRESS</div>
-      <div class="small">Until the mission is complete</div>
-      <div class="mission-percent" id="progressText">0%</div>
-      <div class="bar" style="height:12px"><div class="fill" id="missionBar"></div></div>
+<section class="panel">
+  <h2>SERVER STATUS</h2>
+  <div class="stat"><span>ACTIVE NODES</span><span class="value" id="nodes">---</span></div>
+  <div class="stat"><span>CPU USAGE</span><span class="value" id="cpu">---</span></div>
+  <div class="bar"><div class="fill" id="cpuBar"></div></div>
+  <div class="stat"><span>MEMORY</span><span class="value" id="memory">---</span></div>
+  <div class="bar"><div class="fill" id="memoryBar"></div></div>
+  <div class="stat"><span>NETWORK LOAD</span><span class="value" id="network">---</span></div>
+  <div class="bar"><div class="fill" id="networkBar"></div></div>
+</section>
+
+<section class="panel center">
+  <div class="mission">
+    <div class="mission-title">MISSION PROGRESS</div>
+    <div class="small">Until the mission is complete</div>
+    <div class="mission-percent" id="progressText">0%</div>
+    <div class="bar" style="height:12px">
+      <div class="fill" id="missionBar"></div>
     </div>
+  </div>
 
-    <h2>LIVE TERMINAL</h2>
-    <div class="terminal" id="terminal">
-      <div class="log">[SYSTEM] Awaiting initialization...</div>
-    </div>
+  <h2>LIVE TERMINAL</h2>
+  <div class="terminal" id="terminal">
+    <div class="log">[SYSTEM] Awaiting initialization...</div>
+  </div>
 
-    <div class="inputrow">
-      <input id="commandInput" placeholder="Enter command..." disabled>
-      <button id="sendButton" disabled>SEND</button>
-    </div>
+  <div class="inputrow">
+    <input id="commandInput" placeholder="Enter command..." disabled>
+    <button id="sendButton" disabled>SEND</button>
+  </div>
 
-    <div class="controls">
-      <button id="speed1" disabled>×1 SPEED</button>
-      <button id="speed4" disabled>×4 SPEED</button>
-      <span class="small" id="speedLabel">SPEED: ×1</span>
-    </div>
-  </section>
+  <div class="controls">
+    <button id="speed1" disabled>×1 SPEED</button>
+    <button id="speed4" disabled>×4 SPEED</button>
+    <span class="small" id="speedLabel">SPEED: ×1</span>
+  </div>
+</section>
 
-  <section class="panel">
-    <h2>NETWORK INFORMATION</h2>
-    <div class="stat"><span>DATA FLOW</span><span class="value" id="dataFlow">---</span></div>
-    <div class="stat"><span>CONNECTIONS</span><span class="value" id="connections">---</span></div>
-    <div class="stat"><span>LATENCY</span><span class="value" id="latency">---</span></div>
-    <div class="stat"><span>LOCATION</span><span class="value" id="location">---</span></div>
-    <div class="stat"><span>ENCRYPTION</span><span class="value">ACTIVE</span></div>
-  </section>
+<section class="panel">
+  <h2>NETWORK INFORMATION</h2>
+  <div class="stat"><span>DATA FLOW</span><span class="value" id="dataFlow">---</span></div>
+  <div class="stat"><span>CONNECTIONS</span><span class="value" id="connections">---</span></div>
+  <div class="stat"><span>LATENCY</span><span class="value" id="latency">---</span></div>
+  <div class="stat"><span>LOCATION</span><span class="value" id="location">---</span></div>
+  <div class="stat"><span>ENCRYPTION</span><span class="value">ACTIVE</span></div>
+</section>
 
-  <section class="panel bottom">
-    <h2>MISSION CONTROL</h2>
-    <div class="small" id="missionMessage">PRESS PUSH TO START TO INITIALIZE THE SYSTEM.</div>
-    <div class="actions">
-      <button id="testButton" disabled>PUSH TO TEST</button>
-      <button id="noPush" style="display:none">NO PUSH</button>
-    </div>
-  </section>
+<section class="panel bottom">
+  <h2>MISSION CONTROL</h2>
+  <div class="small" id="missionMessage">
+    PRESS PUSH TO START TO INITIALIZE THE SYSTEM.
+  </div>
+  <div class="actions">
+    <button id="testButton" disabled>PUSH TO TEST</button>
+    <button id="noPush" style="display:none">NO PUSH</button>
+  </div>
+</section>
 
-  <section class="panel bottom">
-    <h2>SYSTEM EVENT LOG</h2>
-    <div class="small" id="eventLog">SYSTEM STANDBY.</div>
-  </section>
+<section class="panel bottom">
+  <h2>SYSTEM EVENT LOG</h2>
+  <div class="small" id="eventLog">SYSTEM STANDBY.</div>
+</section>
+
 </div>
 
 <div id="shutdown"><div id="shutdownText">SHUTTING DOWN...</div></div>
+
 <div id="prank">
   <div>
     <h1>MISSION COMPLETE.</h1>
@@ -192,6 +198,7 @@ let speed=1;
 let progress=0;
 let testCount=0;
 let mode="standby";
+
 let missionTimer=null;
 let logTimer=null;
 let statsTimer=null;
@@ -202,6 +209,11 @@ function addLog(message,type="log"){
   line.className=type;
   line.textContent="["+new Date().toLocaleTimeString()+"] "+message;
   $("terminal").appendChild(line);
+
+  while($("terminal").children.length>100){
+    $("terminal").removeChild($("terminal").firstChild);
+  }
+
   $("terminal").scrollTop=$("terminal").scrollHeight;
 }
 
@@ -217,6 +229,7 @@ function lockInput(value){
 
 function start(){
   if(started)return;
+
   started=true;
   mode="mission";
   locked=false;
@@ -226,11 +239,11 @@ function start(){
   $("missionMessage").textContent="MISSION INITIALIZED. MONITORING IN PROGRESS.";
   $("speed1").disabled=false;
   $("speed4").disabled=false;
-  $("testButton").disabled=true;
 
   addLog("SYSTEM INITIALIZED.","success");
   addLog("SERVER CONNECTION ESTABLISHED.");
   addLog("MISSION SEQUENCE STARTED.");
+
   setEvent("MISSION STARTED.");
 
   startLogs();
@@ -238,14 +251,21 @@ function start(){
   startMission();
 }
 
+/* ミッション進行 */
 function startMission(){
   clearInterval(missionTimer);
+
   const duration=60000/speed;
   const startedAt=Date.now();
 
   missionTimer=setInterval(()=>{
-    if(mode!=="mission"){clearInterval(missionTimer);return;}
+    if(mode!=="mission"){
+      clearInterval(missionTimer);
+      return;
+    }
+
     progress=Math.min(100,((Date.now()-startedAt)/duration)*100);
+
     $("missionBar").style.width=progress+"%";
     $("progressText").textContent=Math.floor(progress)+"%";
 
@@ -253,85 +273,127 @@ function startMission(){
       clearInterval(missionTimer);
       $("testButton").disabled=false;
       $("missionMessage").textContent="MISSION READY. PUSH TO TEST.";
+
       addLog("MISSION PROGRESS COMPLETED.","success");
       setEvent("MISSION READY.");
     }
   },100);
 }
 
+/* ランダム英数字ログ */
 function startLogs(){
-  clearInterval(logTimer);
-  const messages=[
-    "Checking server connection...",
-    "Data packet received.",
-    "Synchronizing remote nodes...",
-    "Encryption protocol verified.",
-    "Monitoring network traffic...",
-    "Connection stable.",
-    "Scanning system status...",
-    "Receiving data stream...",
-    "Server response normal."
+  clearTimeout(logTimer);
+
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#$%&*+-<>[]{}";
+
+  const prefixes=[
+    "[DATA]",
+    "[ACCESS]",
+    "[NODE]",
+    "[SYSTEM]",
+    "[NETWORK]",
+    "[ENCRYPT]",
+    "[SERVER]",
+    "[SCAN]"
   ];
 
-  logTimer=setInterval(()=>{
-    if(locked||!started)return;
-    addLog(messages[Math.floor(Math.random()*messages.length)]);
-  },1100);
+  function randomText(length){
+    let result="";
+    for(let i=0;i<length;i++){
+      result+=chars[Math.floor(Math.random()*chars.length)];
+    }
+    return result;
+  }
+
+  function generateLog(){
+    if(!started || locked)return;
+
+    const prefix=prefixes[Math.floor(Math.random()*prefixes.length)];
+    const length=Math.floor(25+Math.random()*65);
+
+    addLog(prefix+" "+randomText(length));
+
+    logTimer=setTimeout(generateLog,300+Math.random()*700);
+  }
+
+  generateLog();
 }
 
+/* サーバー情報 */
 function startStats(){
   clearInterval(statsTimer);
+
   statsTimer=setInterval(()=>{
     if(!started)return;
+
     const cpu=Math.floor(30+Math.random()*60);
     const mem=Math.floor(35+Math.random()*55);
     const net=Math.floor(15+Math.random()*80);
+
     $("nodes").textContent=Math.floor(120+Math.random()*80);
     $("cpu").textContent=cpu+"%";
     $("memory").textContent=mem+"%";
     $("network").textContent=net+"%";
+
     $("cpuBar").style.width=cpu+"%";
     $("memoryBar").style.width=mem+"%";
     $("networkBar").style.width=net+"%";
+
     $("dataFlow").textContent=(Math.random()*9+1).toFixed(1)+" GB/s";
     $("connections").textContent=Math.floor(800+Math.random()*500);
     $("latency").textContent=Math.floor(10+Math.random()*80)+" ms";
+
     const places=["TOKYO","LONDON","NEW YORK","SINGAPORE","FRANKFURT"];
     $("location").textContent=places[Math.floor(Math.random()*places.length)];
   },1200);
 }
 
+/* 手動入力 */
 function sendCommand(){
   if(locked)return;
+
   const input=$("commandInput");
   const value=input.value.trim();
+
   if(!value)return;
+
   addLog("> "+value,"userlog");
   input.value="";
 }
+
 $("sendButton").onclick=sendCommand;
+
 $("commandInput").addEventListener("keydown",e=>{
   if(e.key==="Enter")sendCommand();
 });
 
+/* 速度変更 */
 function setSpeed(value){
-  if(!started||mode!=="mission")return;
+  if(!started || mode!=="mission")return;
+
   speed=value;
+
   $("speedLabel").textContent="SPEED: ×"+speed;
   $("speed1").style.borderColor=value===1?"#65e6bd":"#3a8290";
   $("speed4").style.borderColor=value===4?"#65e6bd":"#3a8290";
+
   startMission();
 }
+
 $("speed1").onclick=()=>setSpeed(1);
 $("speed4").onclick=()=>setSpeed(4);
 
+/* テスト */
 function testMission(){
-  if(locked||$("testButton").disabled)return;
-  if(mode!=="mission"&&mode!=="failed")return;
+  if(locked || $("testButton").disabled)return;
+  if(mode!=="mission" && mode!=="failed")return;
 
   lockInput(true);
+  clearTimeout(logTimer);
+
   $("testButton").disabled=true;
   mode="testing";
+
   addLog("STARTING SYSTEM TEST...");
   setEvent("TEST PROCESSING...");
   $("missionMessage").textContent="VERIFYING SYSTEM...";
@@ -341,68 +403,97 @@ function testMission(){
 
     if(testCount<3){
       mode="failed";
+
       addLog("TEST FAILED. RETRY REQUIRED.","error");
       setEvent("TEST FAILED. ATTEMPT "+testCount+"/3");
+
       $("missionMessage").textContent="TEST FAILED. PLEASE RETRY.";
       $("testButton").disabled=false;
       $("noPush").style.display="block";
+
       lockInput(false);
+      startLogs();
+
     }else{
       mode="verified";
+
       addLog("TEST SUCCESSFUL.","success");
       addLog("SECRET DOCUMENT ACCESS AUTHORIZED.","success");
+
       setEvent("VERIFICATION SUCCESSFUL.");
       $("missionMessage").textContent="VERIFICATION COMPLETE.";
+
       $("testButton").textContent="PUSH TO SECRET DOCUMENT FILE DOWNLOAD";
       $("testButton").disabled=false;
       $("noPush").style.display="none";
+
       lockInput(false);
+      startLogs();
     }
   },2200);
 }
 
+/* ダウンロード演出 */
 function startDownload(){
-  if(mode!=="verified"||locked)return;
+  if(mode!=="verified" || locked)return;
+
   mode="downloading";
   lockInput(true);
+  clearTimeout(logTimer);
+
   $("testButton").disabled=true;
   $("missionMessage").textContent="DOWNLOADING SECRET DOCUMENT...";
+
   addLog("SECRET DOCUMENT DOWNLOAD STARTED.");
   setEvent("DOWNLOAD IN PROGRESS.");
 
   let downloaded=0;
+  const duration=30000/speed;
+  const startedAt=Date.now();
+
   downloadTimer=setInterval(()=>{
-    downloaded=Math.min(100,downloaded+(100/(30000/(100/speed))));
+    downloaded=Math.min(100,((Date.now()-startedAt)/duration)*100);
+
     $("missionBar").style.width=downloaded+"%";
     $("progressText").textContent=Math.floor(downloaded)+"%";
 
     if(downloaded>=100){
       clearInterval(downloadTimer);
+
       mode="complete";
+
       addLog("DOWNLOAD COMPLETED.","success");
       addLog("ALL OPERATIONS COMPLETED.","success");
+
       setEvent("MISSION COMPLETE.");
       $("missionMessage").textContent="DOWNLOAD COMPLETE.";
+
       $("testButton").textContent="MISSION COMPLETE. NEXT PHASE";
       $("testButton").disabled=false;
+
       lockInput(true);
     }
   },100);
 }
 
+/* 次のフェーズ */
 function nextPhase(){
   if(mode!=="complete")return;
+
   mode="next";
   $("prank").style.display="flex";
 }
 
+/* サイト内シャットダウン演出 */
 function shutdown(){
   clearInterval(missionTimer);
-  clearInterval(logTimer);
+  clearTimeout(logTimer);
   clearInterval(statsTimer);
   clearInterval(downloadTimer);
+
   lockInput(true);
   mode="shutdown";
+
   $("shutdown").style.display="flex";
 
   const steps=[
@@ -411,10 +502,13 @@ function shutdown(){
     "DISCONNECTING REMOTE NODES...",
     "SYSTEM SHUTDOWN COMPLETE."
   ];
+
   let i=0;
   $("shutdownText").textContent=steps[i];
+
   const timer=setInterval(()=>{
     i++;
+
     if(i<steps.length){
       $("shutdownText").textContent=steps[i];
     }else{
@@ -425,13 +519,17 @@ function shutdown(){
   },1100);
 }
 
+/* ボタン */
 $("startButton").onclick=start;
+
 $("testButton").onclick=()=>{
   if(mode==="verified")startDownload();
   else if(mode==="complete")nextPhase();
   else testMission();
 };
+
 $("noPush").onclick=shutdown;
+
 </script>
 </body>
 </html>
